@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Partie 1 — Numérisation & Segmentation{% endblock %}
+{% block breadcrumb %}
+<span class="bc-sep">/</span><span class="bc-page">Numérisation</span>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div class="page-header-icon icon-blue"><i data-lucide="mic"></i></div>
+        <div>
+            <h1>Numérisation & Segmentation</h1>
+            <p>Enregistrez votre voix, configurez les paramètres et segmentez automatiquement.</p>
+        </div>
+    </div>
+</div>
+
+<div class="two-col">
+
+    <!-- ── Enregistrement ─────────────────────────────────────────────── -->
+    <div>
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-head-left">
+                    <div class="panel-head-icon phi-blue"><i data-lucide="settings-2"></i></div>
+                    <div>
+                        <div class="panel-title">Paramètres d'enregistrement</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label class="form-label">Fréquence d'échantillonnage</label>
+                        <select id="sampleRate" class="select">
+                            <option value="16000">16 kHz</option>
+                            <option value="22050">22,05 kHz</option>
+                            <option value="44100" selected>44,1 kHz</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Durée (secondes)</label>
+                        <input type="number" id="duration" class="input" value="5" min="1" max="120" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Locuteur n°</label>
+                        <input type="number" id="locuteur" class="input" value="1" min="1" max="99" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Session n°</label>
+                        <input type="number" id="session" class="input" value="1" min="1" max="99" />
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="form-label">Codage</label>
+                        <div class="radio-group">
+                            <label class="radio-card">
+                                <input type="radio" name="bitDepth" value="16" checked />
+                                <span class="radio-dot"></span>16 bits
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="bitDepth" value="32" />
+                                <span class="radio-dot"></span>32 bits
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div style="display:flex;gap:8px;margin-top:4px;">
+                    <button id="btnRecord" class="btn btn-primary btn-lg">
+                        <i data-lucide="circle"></i>
+                        <span id="recLabel">Enregistrer</span>
+                    </button>
+                    <button id="btnSave" class="btn btn-success" disabled>
+                        <i data-lucide="save"></i>Sauvegarder
+                    </button>
+                </div>
+
+                <div id="recTimerWrap" class="rec-timer-wrap hidden">
+                    <div class="rec-dot"></div>
+                    <span class="rec-timer-val" id="recTimer">00:00</span>
+                    <span style="font-size:12px;color:var(--red)">Enregistrement en cours…</span>
+                </div>
+
+                <div id="recStatus" class="alert hidden"></div>
+                <audio id="audioPreview" controls class="audio-player hidden"></audio>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Segmentation ───────────────────────────────────────────────── -->
+    <div>
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-head-left">
+                    <div class="panel-head-icon phi-amber"><i data-lucide="scissors"></i></div>
+                    <div>
+                        <div class="panel-title">Segmentation automatique</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label class="form-label">Fichier WAV à segmenter</label>
+                    <input type="text" id="segFilepath" class="input"
+                        placeholder="Chemin rempli automatiquement après sauvegarde…" />
+                </div>
+
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label class="form-label">Seuil d'amplitude — silence en dessous</label>
+                    <div class="range-row">
+                        <input type="range" id="thresholdRange" min="-80" max="-10" value="-40" step="1" />
+                        <span id="thresholdVal" class="range-val">-40 dB</span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label class="form-label">Durée minimale de segment (ms)</label>
+                    <input type="number" id="minSilenceMs" class="input" value="300" min="50" max="5000" />
+                </div>
+
+                <button id="btnSegment" class="btn btn-primary btn-lg">
+                    <i data-lucide="scissors"></i>Segmenter
+                </button>
+
+                <div id="segStatus" class="alert hidden"></div>
+
+                <div id="segResults" class="hidden" style="margin-top:16px;">
+                    <div class="seg-count">
+                        <i data-lucide="layers"></i>
+                        <span id="segCount"></span>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Fichier</th>
+                                <th>Durée</th>
+                                <th>Écoute</th>
+                                <th>Export</th>
+                            </tr>
+                        </thead>
+                        <tbody id="segTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Base de données ─────────────────────────────────────────────────── -->
+<div class="panel">
+    <div class="panel-head">
+        <div class="panel-head-left">
+            <div class="panel-head-icon phi-gray"><i data-lucide="database"></i></div>
+            <div>
+                <div class="panel-title">Base de données audio</div>
+                <div class="panel-sub">Arborescence locuteurs / sessions / fichiers</div>
+            </div>
+        </div>
+        <button id="btnRefreshDB" class="btn btn-outline btn-sm">
+            <i data-lucide="refresh-cw"></i>Actualiser
+        </button>
+    </div>
+    <div class="panel-body-sm">
+        <div id="dbTree" class="db-tree"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/recorder.js') }}"></script>
+<script src="{{ url_for('static', filename='js/partie1.js') }}"></script>
+{% endblock %}

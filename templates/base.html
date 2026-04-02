@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}TNS — Signal Vocal{% endblock %}</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <a href="{{ url_for('index') }}" class="sidebar-brand">
+            <div class="brand-logo"><i data-lucide="activity"></i></div>
+            <div>
+                <span class="brand-name">TNS DIC2</span>
+                <span class="brand-sub">ESP / UCAD</span>
+            </div>
+        </a>
+        <nav class="sidebar-nav">
+            <span class="nav-section">Navigation</span>
+            <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                <i data-lucide="home"></i><span>Accueil</span>
+            </a>
+            <a href="{{ url_for('partie1') }}" class="nav-item {% if request.endpoint == 'partie1' %}active{% endif %}">
+                <i data-lucide="mic"></i><span>Numérisation</span>
+                <span class="nav-badge">P1</span>
+            </a>
+            <a href="{{ url_for('partie2') }}" class="nav-item {% if request.endpoint == 'partie2' %}active{% endif %}">
+                <i data-lucide="bar-chart-2"></i><span>FFT / Filtrage</span>
+                <span class="nav-badge">P2</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <i data-lucide="graduation-cap"></i>
+            <span>2025 – 2026</span>
+        </div>
+    </aside>
+
+    <div class="layout-main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="breadcrumb">
+                    <span>TNS DIC2</span>
+                    {% block breadcrumb %}{% endblock %}
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-pill">
+                    <i data-lucide="cpu"></i>
+                    <span>Python · Flask · NumPy</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-body">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="page-footer">
+            ESP – UCAD &middot; DIC2 – Traitement Numérique du Signal &middot; 2025–2026
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

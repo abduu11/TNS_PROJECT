@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Partie 2 — FFT & Filtrage{% endblock %}
+{% block breadcrumb %}
+<span class="bc-sep">/</span><span class="bc-page">FFT / Filtrage</span>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div class="page-header-icon icon-green"><i data-lucide="bar-chart-2"></i></div>
+        <div>
+            <h1>Analyse FFT & Filtrage</h1>
+            <p>Chargez un fichier audio, analysez son spectre et appliquez un filtre rectangulaire.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ── Upload ──────────────────────────────────────────────────────────── -->
+<div class="panel">
+    <div class="panel-head">
+        <div class="panel-head-left">
+            <div class="panel-head-icon phi-blue"><i data-lucide="upload-cloud"></i></div>
+            <div>
+                <div class="panel-title">Chargement du fichier audio</div>
+                <div class="panel-sub">WAV, MP3, OGG, FLAC — conversion automatique en WAV</div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-zone-icon"><i data-lucide="music"></i></div>
+            <p>Glissez un fichier audio ici ou cliquez pour parcourir</p>
+            <p class="upload-hint">WAV, MP3, OGG, FLAC… — conversion automatique en WAV</p>
+            <input type="file" id="fileInput" accept="audio/*" class="file-input" />
+        </div>
+        <div id="uploadStatus" class="alert hidden"></div>
+        <div id="fileInfo" class="file-info-bar hidden"></div>
+    </div>
+</div>
+
+<!-- ── Graphiques initiaux ─────────────────────────────────────────────── -->
+<div id="initialGraphs" class="hidden">
+    <div class="two-col">
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-head-left">
+                    <div class="panel-head-icon phi-blue"><i data-lucide="activity"></i></div>
+                    <div>
+                        <div class="panel-title">Signal temporel x(t)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="chart-wrap"><canvas id="chartTime"></canvas></div>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-head-left">
+                    <div class="panel-head-icon phi-green"><i data-lucide="bar-chart-2"></i></div>
+                    <div>
+                        <div class="panel-title">Spectre FFT |X(f)|</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="chart-wrap"><canvas id="chartFft"></canvas></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Filtre ──────────────────────────────────────────────────────────── -->
+<div class="panel" id="filterPanel" style="display:none">
+    <div class="panel-head">
+        <div class="panel-head-left">
+            <div class="panel-head-icon phi-amber"><i data-lucide="filter"></i></div>
+            <div>
+                <div class="panel-title">Définition du filtre rectangulaire</div>
+                <div class="panel-sub">Masque fréquentiel — contrainte absolue du sujet</div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="formula-box">
+            <span class="fkey">H(f)</span> = 1 &nbsp;si&nbsp;
+            <span class="fkey">f<sub>min</sub></span> &le; |f| &le;
+            <span class="fkey">f<sub>max</sub></span>
+            &nbsp;(passe-bande) &nbsp;&nbsp;|&nbsp;&nbsp;
+            <span class="fkey">H&#772;(f)</span> = 1 &minus; H(f) &nbsp;(coupe-bande)
+        </div>
+
+        <div class="filter-grid">
+            <div class="form-group">
+                <label class="form-label">f<sub>min</sub> (Hz)</label>
+                <input type="number" id="fMin" class="input" value="300" min="0" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">f<sub>max</sub> (Hz)</label>
+                <input type="number" id="fMax" class="input" value="3400" min="0" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Type de filtre</label>
+                <div class="radio-group">
+                    <label class="radio-card">
+                        <input type="radio" name="filterType" value="passe-bande" checked />
+                        <span class="radio-dot"></span>Passe-bande
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="filterType" value="coupe-bande" />
+                        <span class="radio-dot"></span>Coupe-bande
+                    </label>
+                </div>
+            </div>
+            <div class="form-group" style="justify-content:flex-end;">
+                <button id="btnFilter" class="btn btn-primary btn-lg">
+                    <i data-lucide="zap"></i>Appliquer le filtre
+                </button>
+            </div>
+        </div>
+
+        <div id="filterStatus" class="alert hidden"></div>
+    </div>
+</div>
+
+<!-- ── Résultats ───────────────────────────────────────────────────────── -->
+<div id="filterResults" class="hidden">
+    <div class="two-col">
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-head-left">
+                    <div class="panel-head-icon phi-blue"><i data-lucide="activity"></i></div>
+                    <div>
+                        <div class="panel-title">Signal temporel — Avant / Après</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="chart-wrap"><canvas id="chartCompareTime"></canvas></div>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-head-left">
+                    <div class="panel-head-icon phi-green"><i data-lucide="bar-chart-2"></i></div>
+                    <div>
+                        <div class="panel-title">Spectre FFT — Avant / Après</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="chart-wrap"><canvas id="chartCompareFft"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <div class="panel-head-left">
+                <div class="panel-head-icon phi-green"><i data-lucide="headphones"></i></div>
+                <div>
+                    <div class="panel-title">Signal filtré</div>
+                </div>
+            </div>
+            <a id="btnDownloadFiltered" class="btn btn-success btn-sm" download>
+                <i data-lucide="download"></i>Télécharger WAV
+            </a>
+        </div>
+        <div class="panel-body">
+            <audio id="audioFiltered" controls class="audio-player"></audio>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/partie2.js') }}"></script>
+{% endblock %}

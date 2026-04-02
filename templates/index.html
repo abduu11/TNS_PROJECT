@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}TNS — Accueil{% endblock %}
+{% block breadcrumb %}<span class="bc-sep">/</span><span class="bc-page">Accueil</span>{% endblock %}
+
+{% block content %}
+<div class="hero">
+
+    <div class="hero-eyebrow">
+        <i data-lucide="zap"></i>
+        Mini-Projet TNS
+    </div>
+    <h1 class="hero-title">Traitement Numérique<br>du Signal Vocal</h1>
+    <p class="hero-sub">DIC2 – 4ème année – Génie Informatique &nbsp;&middot;&nbsp; ESP / UCAD</p>
+
+    <div class="cards-grid">
+
+        <a href="{{ url_for('partie1') }}" class="card card-p1">
+            <div class="card-header">
+                <div class="card-icon-wrap"><i data-lucide="mic"></i></div>
+                <div>
+                    <div class="card-label">Partie 1</div>
+                    <div class="card-title">Numérisation & Segmentation</div>
+                </div>
+            </div>
+            <ul class="card-list">
+                <li><i data-lucide="check"></i>Enregistrement microphone</li>
+                <li><i data-lucide="check"></i>Choix fréquence / codage</li>
+                <li><i data-lucide="check"></i>Détection automatique des silences</li>
+                <li><i data-lucide="check"></i>Base de données audio locale</li>
+            </ul>
+            <div class="card-arrow">
+                Ouvrir <i data-lucide="arrow-right"></i>
+            </div>
+        </a>
+
+        <a href="{{ url_for('partie2') }}" class="card card-p2">
+            <div class="card-header">
+                <div class="card-icon-wrap"><i data-lucide="bar-chart-2"></i></div>
+                <div>
+                    <div class="card-label">Partie 2</div>
+                    <div class="card-title">Analyse FFT & Filtrage</div>
+                </div>
+            </div>
+            <ul class="card-list">
+                <li><i data-lucide="check"></i>Chargement & conversion WAV</li>
+                <li><i data-lucide="check"></i>Spectre d'amplitude FFT</li>
+                <li><i data-lucide="check"></i>Filtre rectangulaire uniquement</li>
+                <li><i data-lucide="check"></i>Reconstruction IFFT + export</li>
+            </ul>
+            <div class="card-arrow">
+                Ouvrir <i data-lucide="arrow-right"></i>
+            </div>
+        </a>
+
+    </div>
+
+    <div class="info-chips">
+        <span class="chip"><i data-lucide="code-2"></i>Python 3 + Flask</span>
+        <span class="chip"><i data-lucide="filter"></i>Masque rectangulaire</span>
+        <span class="chip"><i data-lucide="music"></i>Format WAV imposé</span>
+        <span class="chip"><i data-lucide="database"></i>Base de données locale</span>
+    </div>
+
+</div>
+{% endblock %}
