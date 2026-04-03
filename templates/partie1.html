@@ -16,7 +16,7 @@
     </div>
 </div>
 
-<div class="two-col">
+<div class="two-col stagger">
 
     <!-- ── Enregistrement ─────────────────────────────────────────────── -->
     <div>
@@ -113,7 +113,7 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom:14px;">
-                    <label class="form-label">Seuil d'amplitude — silence en dessous</label>
+                    <label class="form-label">Seuil d'amplitude — silence en dessous (dB)</label>
                     <div class="range-row">
                         <input type="range" id="thresholdRange" min="-80" max="-10" value="-40" step="1" />
                         <span id="thresholdVal" class="range-val">-40 dB</span>
@@ -121,7 +121,7 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom:16px;">
-                    <label class="form-label">Durée minimale de segment (ms)</label>
+                    <label class="form-label">Durée minimale de silence à ignorer (ms)</label>
                     <input type="number" id="minSilenceMs" class="input" value="300" min="50" max="5000" />
                 </div>
 

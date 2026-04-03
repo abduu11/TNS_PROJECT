@@ -23,7 +23,7 @@
             <div class="panel-head-icon phi-blue"><i data-lucide="upload-cloud"></i></div>
             <div>
                 <div class="panel-title">Chargement du fichier audio</div>
-                <div class="panel-sub">WAV, MP3, OGG, FLAC — conversion automatique en WAV</div>
+                <div class="panel-sub">WAV, MP3, OGG, FLAC (conversion automatique en WAV)</div>
             </div>
         </div>
     </div>
@@ -31,7 +31,7 @@
         <div class="upload-zone" id="uploadZone">
             <div class="upload-zone-icon"><i data-lucide="music"></i></div>
             <p>Glissez un fichier audio ici ou cliquez pour parcourir</p>
-            <p class="upload-hint">WAV, MP3, OGG, FLAC… — conversion automatique en WAV</p>
+            <p class="upload-hint">WAV, MP3, OGG, FLAC… (conversion automatique en WAV)</p>
             <input type="file" id="fileInput" accept="audio/*" class="file-input" />
         </div>
         <div id="uploadStatus" class="alert hidden"></div>
@@ -67,6 +67,21 @@
             <div class="panel-body">
                 <div class="chart-wrap"><canvas id="chartFft"></canvas></div>
             </div>
+        </div>
+    </div>
+
+    <!-- Lecteur audio original -->
+    <div class="panel">
+        <div class="panel-head">
+            <div class="panel-head-left">
+                <div class="panel-head-icon phi-blue"><i data-lucide="headphones"></i></div>
+                <div>
+                    <div class="panel-title">Écoute du signal original</div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <audio id="audioOriginal" controls class="audio-player"></audio>
         </div>
     </div>
 </div>

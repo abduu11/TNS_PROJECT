@@ -5,75 +5,153 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}TNS — Signal Vocal{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ css_version }}" />
 </head>
 
 <body>
 
-    <aside class="sidebar" id="sidebar">
-        <a href="{{ url_for('index') }}" class="sidebar-brand">
-            <div class="brand-logo"><i data-lucide="activity"></i></div>
-            <div>
-                <span class="brand-name">TNS DIC2</span>
-                <span class="brand-sub">ESP / UCAD</span>
-            </div>
-        </a>
-        <nav class="sidebar-nav">
-            <span class="nav-section">Navigation</span>
-            <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
-                <i data-lucide="home"></i><span>Accueil</span>
-            </a>
-            <a href="{{ url_for('partie1') }}" class="nav-item {% if request.endpoint == 'partie1' %}active{% endif %}">
-                <i data-lucide="mic"></i><span>Numérisation</span>
-                <span class="nav-badge">P1</span>
-            </a>
-            <a href="{{ url_for('partie2') }}" class="nav-item {% if request.endpoint == 'partie2' %}active{% endif %}">
-                <i data-lucide="bar-chart-2"></i><span>FFT / Filtrage</span>
-                <span class="nav-badge">P2</span>
-            </a>
-        </nav>
-        <div class="sidebar-footer">
-            <i data-lucide="graduation-cap"></i>
-            <span>2025 – 2026</span>
-        </div>
-    </aside>
+    <!-- Backdrop mobile (ferme la sidebar au tap) -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-    <div class="layout-main">
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="sidebar-toggle" id="sidebarToggle">
-                    <i data-lucide="menu"></i>
+    <!-- ── SHELL : flex row ── -->
+    <div class="shell" id="shell">
+
+        <!-- ── SIDEBAR ── -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo"><i data-lucide="activity"></i></div>
+                <div class="brand-text">
+                    <span class="brand-name">TNS DIC2</span>
+                    <span class="brand-sub">ESP / UCAD</span>
+                </div>
+                <!-- Bouton toggle DANS la sidebar, comme BoviBot -->
+                <button class="sidebar-toggle" id="sidebarToggle" title="Réduire / Déplier">
+                    <i data-lucide="chevron-left" id="toggleIcon"></i>
                 </button>
-                <div class="breadcrumb">
-                    <span>TNS DIC2</span>
-                    {% block breadcrumb %}{% endblock %}
-                </div>
             </div>
-            <div class="topbar-right">
-                <div class="topbar-pill">
-                    <i data-lucide="cpu"></i>
-                    <span>Python · Flask · NumPy</span>
-                </div>
+
+            <div class="nav-section-label">Navigation</div>
+
+            <ul class="nav-list">
+                <li>
+                    <a href="{{ url_for('index') }}"
+                        class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                        <span class="nav-icon"><i data-lucide="home"></i></span>
+                        <span class="nav-label">Accueil</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('partie1') }}"
+                        class="nav-item {% if request.endpoint == 'partie1' %}active{% endif %}">
+                        <span class="nav-icon"><i data-lucide="mic"></i></span>
+                        <span class="nav-label">Numérisation</span>
+                        <span class="nav-badge">P1</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('partie2') }}"
+                        class="nav-item {% if request.endpoint == 'partie2' %}active{% endif %}">
+                        <span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>
+                        <span class="nav-label">FFT / Filtrage</span>
+                        <span class="nav-badge">P2</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <span class="nav-icon"><i data-lucide="graduation-cap"></i></span>
+                <span class="status-text">2025 – 2026</span>
             </div>
-        </header>
+        </nav>
 
-        <main class="page-body">
-            {% block content %}{% endblock %}
-        </main>
+        <!-- ── MAIN ── -->
+        <div class="layout-main">
 
-        <footer class="page-footer">
-            ESP – UCAD &middot; DIC2 – Traitement Numérique du Signal &middot; 2025–2026
-        </footer>
-    </div>
+            <header class="topbar">
+                <div class="topbar-left">
+                    <!-- Bouton menu visible uniquement sur mobile -->
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <span>TNS DIC2</span>
+                        {% block breadcrumb %}{% endblock %}
+                    </div>
+                </div>
+            </header>
+
+            <main class="page-body animate-fade-up">
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer class="page-footer">TNSabduXadja</footer>
+        </div>
+
+    </div><!-- /.shell -->
 
     <script>
         lucide.createIcons();
-        document.getElementById('sidebarToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('open');
+
+        const shell = document.getElementById('shell');
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+
+        const isMobile = () => window.innerWidth <= 768;
+
+        // ── Desktop : collapse / expand ──────────────────────────────
+        toggle.addEventListener('click', () => {
+            if (isMobile()) return;
+            const collapsed = shell.classList.toggle('sidebar-collapsed');
+            sidebar.classList.remove('peek');
         });
+
+        // ── Desktop hover-peek (comme BoviBot) ───────────────────────
+        sidebar.addEventListener('mouseenter', () => {
+            if (!isMobile() && shell.classList.contains('sidebar-collapsed')) {
+                sidebar.classList.add('peek');
+            }
+        });
+        sidebar.addEventListener('mouseleave', () => {
+            sidebar.classList.remove('peek');
+        });
+
+        // ── Mobile : ouvrir via bouton menu ──────────────────────────
+        mobileBtn.addEventListener('click', () => {
+            shell.classList.remove('sidebar-collapsed');
+            backdrop.style.display = 'block';
+        });
+
+        // ── Mobile : fermer via backdrop ─────────────────────────────
+        backdrop.addEventListener('click', () => {
+            shell.classList.add('sidebar-collapsed');
+            backdrop.style.display = 'none';
+        });
+
+        // ── Mobile : fermer après clic nav ───────────────────────────
+        document.querySelectorAll('.nav-item').forEach(link => {
+            link.addEventListener('click', () => {
+                if (isMobile()) {
+                    shell.classList.add('sidebar-collapsed');
+                    backdrop.style.display = 'none';
+                }
+            });
+        });
+
+        // ── Init mobile : collapsed par défaut ───────────────────────
+        if (isMobile()) {
+            shell.classList.add('sidebar-collapsed');
+        }
     </script>
+
     {% block scripts %}{% endblock %}
 </body>
 

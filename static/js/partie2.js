@@ -156,6 +156,9 @@ async function uploadFile(file) {
     fileInfo.classList.remove("hidden");
     lucide.createIcons();
 
+    // Lecteur audio original — URL directe du fichier uploadé
+    document.getElementById("audioOriginal").src = "/uploads/" + json.wav_path.split(/[\\/]/).pop();
+
     chartTime = makeChart(chartTime, "chartTime",
       json.time_data.labels,
       [{ label: "x(t)", data: json.time_data.values,

@@ -12,7 +12,7 @@ import librosa
 
 app = Flask(__name__)
 
-# ── Dossiers de travail ──────────────────────────────────────────────────────
+#Dossiers de travail
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 DB_DIR     = os.path.join(BASE_DIR, "database")
 SEG_DIR    = os.path.join(BASE_DIR, "segments")
@@ -21,14 +21,20 @@ UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 for d in (DB_DIR, SEG_DIR, UPLOAD_DIR):
     os.makedirs(d, exist_ok=True)
 
-# ── Valeurs autorisées (contrainte du sujet) ─────────────────────────────────
+@app.context_processor
+def inject_css_version():
+    """Injecte css_version (timestamp du CSS) dans tous les templates pour cache-busting."""
+    try:
+        mtime = os.path.getmtime(os.path.join(BASE_DIR, "static", "css", "style.css"))
+        return {"css_version": str(int(mtime))}
+    except Exception:
+        return {"css_version": "1"}
+
+# Valeurs autorisées
 ALLOWED_SAMPLE_RATES = {16000, 22050, 44100}
 ALLOWED_BIT_DEPTHS   = {16, 32}
 
-
-# ════════════════════════════════════════════════════════════════════════════
 #  ROUTES PRINCIPALES
-# ════════════════════════════════════════════════════════════════════════════
 
 @app.route("/")
 def index():
@@ -88,7 +94,6 @@ def save_recording():
     # Rééchantillonnage si la fréquence native du micro diffère de la cible
     native_sr = int(data.get("native_sr", sample_rate))
     if native_sr != sample_rate:
-        import librosa
         samples_f32 = librosa.resample(samples_f32, orig_sr=native_sr, target_sr=sample_rate)
 
     # Conversion vers la profondeur de bits cible
@@ -209,10 +214,7 @@ def list_database():
             ]
     return jsonify(structure)
 
-
-# ════════════════════════════════════════════════════════════════════════════
 #  PARTIE 2 – API
-# ════════════════════════════════════════════════════════════════════════════
 
 @app.route("/api/upload_audio", methods=["POST"])
 def upload_audio():
@@ -296,14 +298,14 @@ def filter_audio():
     N     = len(samples)
     freqs = fftfreq(N, d=1.0 / sr)
 
-    # ── Masque rectangulaire (contrainte absolue du sujet) ───────────────────
+    # Masque rectangulaire
     mask = np.zeros(N, dtype=np.float64)
     mask[(np.abs(freqs) >= f_min) & (np.abs(freqs) <= f_max)] = 1.0
 
     if filter_type == "coupe-bande":
         mask = 1.0 - mask   # H_bar(f) = 1 - H(f)
 
-    # ── Application du masque dans le domaine fréquentiel ───────────────────
+    # Application du masque dans le domaine fréquentiel
     X          = fft(samples)
     X_filtered = X * mask
     y_filtered = np.real(ifft(X_filtered))
@@ -344,9 +346,22 @@ def serve_filtered(filename):
     return send_file(path, as_attachment=bool(dl), mimetype="audio/wav")
 
 
-# ════════════════════════════════════════════════════════════════════════════
+@app.route("/uploads/<filename>")
+def serve_upload(filename):
+    """
+    Sert un fichier audio uploadé (original ou converti) pour lecture.
+
+    Paramètres URL :
+        filename (str) : nom du fichier dans le dossier uploads
+
+    Retourne :
+        Fichier audio en réponse HTTP.
+    """
+    path = os.path.join(UPLOAD_DIR, filename)
+    return send_file(path, mimetype="audio/wav")
+
+
 #  FONCTIONS UTILITAIRES – DONNÉES POUR CHART.JS
-# ════════════════════════════════════════════════════════════════════════════
 
 # Nombre max de points envoyés au front (performance Chart.js)
 MAX_PLOT_POINTS = 4000
@@ -448,4 +463,5 @@ def _build_fft_data(samples, sr):
         "values": [round(float(x), 6) for x in m_ds]
     }
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
