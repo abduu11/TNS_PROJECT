@@ -251,6 +251,9 @@ def upload_audio():
     sr, samples = wavfile.read(wav_path)
     if samples.ndim > 1:
         samples = samples[:, 0]
+    # Normaliser les float32 vers la plage int16 pour cohérence des calculs
+    if samples.dtype == np.float32 or samples.dtype == np.float64:
+        samples = (samples * 32767).clip(-32768, 32767)
     samples = samples.astype(np.float64)
 
     return jsonify({
@@ -293,6 +296,8 @@ def filter_audio():
     sr, samples = wavfile.read(wav_path)
     if samples.ndim > 1:
         samples = samples[:, 0]
+    if samples.dtype == np.float32 or samples.dtype == np.float64:
+        samples = (samples * 32767).clip(-32768, 32767)
     samples = samples.astype(np.float64)
 
     N     = len(samples)
@@ -317,7 +322,16 @@ def filter_audio():
 
     out_name = f"filtered_{os.path.basename(wav_path)}"
     out_path = os.path.join(UPLOAD_DIR, out_name)
-    wavfile.write(out_path, sr, y_filtered.astype(np.int16))
+
+    # Normalisation robuste : ramener à la même amplitude que l'original
+    # puis convertir en int16 (plage -32768 à 32767)
+    orig_max = np.max(np.abs(samples))
+    filt_max = np.max(np.abs(y_filtered))
+    if filt_max > 0 and orig_max > 0:
+        y_filtered = y_filtered / filt_max * orig_max
+    # Clamp et conversion int16
+    y_int16 = np.clip(y_filtered, -32768, 32767).astype(np.int16)
+    wavfile.write(out_path, sr, y_int16)
 
     return jsonify({
         "time_orig":       _build_time_data(samples, sr),

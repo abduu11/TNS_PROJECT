@@ -1288,7 +1288,7 @@ body {
 }
 
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
-@media (max-width:900px) {
+@media (max-width: 900px) {
     .two-col {
         grid-template-columns: 1fr;
     }
@@ -1307,5 +1307,102 @@ body {
 
     .hero-title {
         font-size: 22px;
+    }
+}
+
+@media (max-width: 600px) {
+    .page-body {
+        padding: 16px 12px 0;
+    }
+
+    .panel-body {
+        padding: 14px 12px;
+    }
+
+    .panel-head {
+        padding: 12px;
+    }
+
+    .panel-body-sm {
+        padding: 12px;
+    }
+
+    .two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        padding: 16px 12px 28px;
+    }
+
+    .hero-title {
+        font-size: 20px;
+    }
+
+    .hero-sub {
+        margin-bottom: 20px;
+    }
+
+    .chart-wrap {
+        height: 160px;
+    }
+
+    .upload-zone {
+        padding: 24px 12px;
+    }
+
+    .formula-box {
+        font-size: 11.5px;
+        padding: 8px 10px;
+    }
+
+    /* Tableau segments scrollable horizontalement */
+    .seg-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Noms de fichiers tronqués */
+    .data-table .mono {
+        max-width: 130px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Audio inline dans le tableau : taille réduite */
+    .data-table audio {
+        width: 120px;
+        height: 28px;
+    }
+
+    .btn-lg {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .page-header h1 {
+        font-size: 17px;
+    }
+
+    .topbar {
+        padding: 0 12px;
+    }
+
+    .page-footer {
+        padding: 12px;
     }
 }

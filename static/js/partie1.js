@@ -38,6 +38,15 @@ btnRecord.addEventListener("click", async () => {
  */
 async function startRecording() {
   const duration = parseInt(document.getElementById("duration").value) || 5;
+
+  // Vérifier que l'API est disponible (HTTPS ou localhost requis)
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showAlert(recStatus,
+      "Microphone indisponible. Accédez via http://localhost:5000 ou activez HTTPS.",
+      "error");
+    return;
+  }
+
   try {
     recorder = new AudioRecorder(duration);
 
